@@ -104,10 +104,10 @@
   <!-- Notification Toast Container -->
   <div id="toastContainer" class="absolute top-16 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Top Bar: Clean Editorial Header & Master Actions -->
-  <header class="relative z-10 w-full px-5 py-3 flex flex-wrap items-center justify-between gap-4 bg-white/95 border-b border-stone-200 backdrop-blur-sm shadow-xs">
+  <!-- Top Bar: Clean Editorial Header & Master Actions (z-30 ensures dropdowns stack on top of aside panels) -->
+  <header class="relative z-30 w-full px-5 py-3 flex flex-wrap items-center justify-between gap-4 bg-white/95 border-b border-stone-200 backdrop-blur-sm shadow-xs">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-neutral-900 text-white flex items-center justify-center font-bold text-sm">
+      <div class="w-8 h-8 rounded-lg bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shadow-xs">
         <i class="fa-solid fa-record-vinyl"></i>
       </div>
       <div>
@@ -119,16 +119,39 @@
       </div>
     </div>
 
-    <!-- Center Transport & MIDI Actions -->
-    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl border border-stone-200">
+    <!-- Center Transport & MIDI Actions with BPM & Quantification -->
+    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl border border-stone-200 flex-wrap sm:flex-nowrap">
       <button id="btnPlay" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium flex items-center gap-2 transition-colors shadow-xs">
         <i class="fa-solid fa-play text-[10px]"></i>
         <span>Start Audio</span>
       </button>
 
       <button id="btnClear" class="px-2.5 py-1.5 rounded-lg hover:bg-white text-stone-700 text-xs font-medium transition-colors" title="Reset orbits to center">
-        <i class="fa-solid fa-rotate-right mr-1 text-[11px]"></i> Reset Orbits
+        <i class="fa-solid fa-rotate-right mr-1 text-[11px]"></i> Reset
       </button>
+
+      <div class="h-4 w-[1px] bg-stone-300 mx-0.5"></div>
+
+      <!-- BPM Input -->
+      <div class="flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-stone-200 shadow-2xs" title="Tempo (Beats Per Minute)">
+        <span class="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wider">BPM</span>
+        <input type="number" id="hdrBpm" min="40" max="240" value="120" class="w-12 text-center font-mono font-bold text-xs bg-transparent focus:outline-none text-stone-800" />
+      </div>
+
+      <!-- Quantize Selector -->
+      <div class="flex items-center gap-1.5 px-2 py-1 bg-white rounded-lg border border-stone-200 shadow-2xs" title="Quantification grid (rhythmic note alignment)">
+        <i class="fa-solid fa-magnet text-[10px] text-blue-600"></i>
+        <span class="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wider">QUANT</span>
+        <select id="hdrQuantize" class="text-xs font-mono font-medium bg-transparent text-stone-800 focus:outline-none cursor-pointer">
+          <option value="off">Off (Free)</option>
+          <option value="1/4">1/4 Beat</option>
+          <option value="1/8">1/8 Note</option>
+          <option value="1/8t">1/8 Triplet</option>
+          <option value="1/16" selected>1/16 Note</option>
+          <option value="1/16t">1/16 Triplet</option>
+          <option value="1/32">1/32 Note</option>
+        </select>
+      </div>
 
       <div class="h-4 w-[1px] bg-stone-300 mx-0.5"></div>
 
@@ -155,27 +178,27 @@
       </div>
 
       <div class="relative">
-        <button id="btnPresets" class="px-3 py-1.5 rounded-lg editorial-input text-xs font-medium text-stone-700 flex items-center gap-1.5">
+        <button id="btnPresets" class="px-3 py-1.5 rounded-lg editorial-input text-xs font-medium text-stone-700 flex items-center gap-1.5 cursor-pointer hover:bg-stone-50">
           <i class="fa-solid fa-sliders text-blue-600 text-xs"></i>
           <span>Curated Styles</span>
           <i class="fa-solid fa-chevron-down text-[9px] text-stone-400 ml-1"></i>
         </button>
-        <div id="presetsMenu" class="hidden absolute right-0 mt-2 w-52 py-1 rounded-xl bg-white border border-stone-200 shadow-lg z-50 flex flex-col text-left">
-          <button data-preset="sparseZen" class="px-3 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col">
+        <div id="presetsMenu" class="hidden absolute right-0 mt-2 w-60 py-1.5 rounded-xl bg-white border border-stone-200 shadow-2xl z-50 flex flex-col text-left">
+          <button data-preset="sparseZen" class="px-3.5 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col text-left cursor-pointer transition-colors">
             <span class="font-medium">Zen Rain (Sparse & Isolated)</span>
-            <span class="text-[10px] text-stone-500">Slow 0.15x drift, 1 hit / 4s, long tone</span>
+            <span class="text-[10px] text-stone-500">75 BPM • Off • 1 hit / ~4s, long tone</span>
           </button>
-          <button data-preset="pluckedHarp" class="px-3 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col border-t border-stone-100">
+          <button data-preset="pluckedHarp" class="px-3.5 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col text-left border-t border-stone-100 cursor-pointer transition-colors">
             <span class="font-medium">Acoustic Harp Arp</span>
-            <span class="text-[10px] text-stone-500">Crisp staccato, moderate flow</span>
+            <span class="text-[10px] text-stone-500">110 BPM • 1/8 grid • Crisp staccato</span>
           </button>
-          <button data-preset="denseOstinato" class="px-3 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col border-t border-stone-100">
+          <button data-preset="denseOstinato" class="px-3.5 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col text-left border-t border-stone-100 cursor-pointer transition-colors">
             <span class="font-medium">Mechanical Ostinato (Dense)</span>
-            <span class="text-[10px] text-stone-500">12 hits/sec, separated crisp gates</span>
+            <span class="text-[10px] text-stone-500">136 BPM • 1/16 grid • 12 hits/sec</span>
           </button>
-          <button data-preset="ambientDrone" class="px-3 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col border-t border-stone-100">
+          <button data-preset="ambientDrone" class="px-3.5 py-2 text-xs hover:bg-stone-50 text-stone-800 flex flex-col text-left border-t border-stone-100 cursor-pointer transition-colors">
             <span class="font-medium">Celestial Resonances</span>
-            <span class="text-[10px] text-stone-500">Long 3.2s sustain, shimmering space</span>
+            <span class="text-[10px] text-stone-500">65 BPM • Off • 3.2s sustain space</span>
           </button>
         </div>
       </div>
@@ -296,6 +319,50 @@
         <span id="rateEstimateBadge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
           ~1.2 hits/sec
         </span>
+      </div>
+
+      <!-- TEMPO & BPM LEVER -->
+      <div class="space-y-1.5 pb-2 border-b border-stone-100">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-medium text-stone-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-stopwatch text-blue-600 text-xs"></i> Master Tempo
+          </span>
+          <span id="valBpm" class="font-mono text-[11px] text-stone-800 font-semibold px-1.5 py-0.5 bg-stone-100 rounded border border-stone-200">120 BPM</span>
+        </div>
+        <input type="range" id="rngBpm" min="40" max="240" step="1" value="120" class="w-full" />
+        <div class="flex items-center justify-between gap-1">
+          <button type="button" class="btn-quick-bpm px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] font-mono text-stone-700 transition-colors" data-bpm="80">80</button>
+          <button type="button" class="btn-quick-bpm px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] font-mono text-stone-700 transition-colors" data-bpm="100">100</button>
+          <button type="button" class="btn-quick-bpm px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-medium transition-colors" data-bpm="120">120</button>
+          <button type="button" class="btn-quick-bpm px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] font-mono text-stone-700 transition-colors" data-bpm="140">140</button>
+          <button type="button" class="btn-quick-bpm px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] font-mono text-stone-700 transition-colors" data-bpm="170">170</button>
+        </div>
+        <div class="flex items-center justify-between pt-0.5">
+          <label class="text-[10px] text-stone-500 flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="chkSyncOrbitBpm" checked class="rounded border-stone-300 text-blue-600 focus:ring-0 text-xs" />
+            <span>Link Orbit Velocity to BPM</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- QUANTIFICATION / QUANTIZE LEVER -->
+      <div class="space-y-1.5 pb-2 border-b border-stone-100">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-medium text-stone-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-magnet text-blue-600 text-xs"></i> Quantification Grid
+          </span>
+          <span id="valQuantizeGrid" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">125 ms</span>
+        </div>
+        <select id="selQuantize" class="w-full editorial-input rounded-lg px-2 py-1 text-xs font-mono">
+          <option value="off">Off (Free Organic Physics)</option>
+          <option value="1/4">1/4 Note (Quarter / 500ms @ 120)</option>
+          <option value="1/8">1/8 Note (Eighth / 250ms @ 120)</option>
+          <option value="1/8t">1/8 Triplet (166.7ms @ 120)</option>
+          <option value="1/16" selected>1/16 Note (Sixteenth / 125ms @ 120)</option>
+          <option value="1/16t">1/16 Triplet (83.3ms @ 120)</option>
+          <option value="1/32">1/32 Note (Thirty-second / 62.5ms @ 120)</option>
+        </select>
+        <p class="text-[10px] text-stone-500 leading-tight">Snaps spoke collision attack times to metric subdivisions. Prevents rhythmic drift and locks MIDI export to the grid.</p>
       </div>
 
       <!-- LEVER 1: Master Orbit Speed Multiplier -->
@@ -450,6 +517,11 @@
       recordingStartTime: 0,
       recordedEvents: [],
       
+      // Master Tempo & Quantification Grid
+      bpm: 120,
+      quantizeGrid: '1/16',
+      syncOrbitBpm: true,
+
       // Harmonic scale state
       rootKey: 'D',
       scaleType: 'dorian',
@@ -474,6 +546,76 @@
       webMidiOutput: null,
       availableMidiOutputs: []
     };
+
+    function getGridDivision(grid) {
+      switch (grid) {
+        case '1/4': return 1.0;
+        case '1/8': return 0.5;
+        case '1/8t': return 1.0 / 3.0;
+        case '1/16': return 0.25;
+        case '1/16t': return 1.0 / 6.0;
+        case '1/32': return 0.125;
+        default: return 0;
+      }
+    }
+
+    function getGridIntervalSec() {
+      const div = getGridDivision(state.quantizeGrid);
+      if (div <= 0) return 0;
+      return (60.0 / state.bpm) * div;
+    }
+
+    function updateQuantizeBadge() {
+      const badge = document.getElementById('valQuantizeGrid');
+      if (!badge) return;
+      const sec = getGridIntervalSec();
+      if (sec <= 0) {
+        badge.textContent = 'Free (No snap)';
+        badge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200';
+      } else {
+        const ms = (sec * 1000).toFixed(1);
+        badge.textContent = `${ms} ms`;
+        badge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200';
+      }
+    }
+
+    function setBpm(val) {
+      let bpm = parseInt(val, 10);
+      if (isNaN(bpm)) bpm = 120;
+      bpm = Math.max(40, Math.min(240, bpm));
+      state.bpm = bpm;
+
+      const hdrBpm = document.getElementById('hdrBpm');
+      const rngBpm = document.getElementById('rngBpm');
+      const valBpm = document.getElementById('valBpm');
+      if (hdrBpm && parseInt(hdrBpm.value, 10) !== bpm) hdrBpm.value = bpm;
+      if (rngBpm && parseInt(rngBpm.value, 10) !== bpm) rngBpm.value = bpm;
+      if (valBpm) valBpm.textContent = `${bpm} BPM`;
+
+      document.querySelectorAll('.btn-quick-bpm').forEach(btn => {
+        if (parseInt(btn.dataset.bpm, 10) === bpm) {
+          btn.className = 'btn-quick-bpm px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-medium transition-colors';
+        } else {
+          btn.className = 'btn-quick-bpm px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] font-mono text-stone-700 transition-colors';
+        }
+      });
+
+      if (window.Tone && Tone.Transport) {
+        try { Tone.Transport.bpm.value = bpm; } catch (e) {}
+      }
+
+      updateQuantizeBadge();
+      updateCalculatedIncidentEstimate();
+    }
+
+    function setQuantize(val) {
+      state.quantizeGrid = val;
+      const hdrQuantize = document.getElementById('hdrQuantize');
+      const selQuantize = document.getElementById('selQuantize');
+      if (hdrQuantize && hdrQuantize.value !== val) hdrQuantize.value = val;
+      if (selQuantize && selQuantize.value !== val) selQuantize.value = val;
+      updateQuantizeBadge();
+    }
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
@@ -555,7 +697,8 @@
     function updateCalculatedIncidentEstimate() {
       // Estimated incident frequency per particle = (Speed / ~0.35) * (SpokeCount / 8) * Probability
       // Gives intuitive feedback on current lever settings
-      const baseRevsPerSec = (state.speedMultiplier * 0.42);
+      const bpmScale = state.syncOrbitBpm ? (state.bpm / 120) : 1.0;
+      const baseRevsPerSec = (state.speedMultiplier * bpmScale * 0.42);
       const hitsPerNodePerSec = Math.max(0.1, baseRevsPerSec * state.spokeCount * state.triggerProbability);
       const totalSystemRate = hitsPerNodePerSec * state.nodeCount;
 
@@ -608,6 +751,11 @@
         }).connect(filter);
 
         synth.volume.value = -6;
+
+        if (Tone.Transport) {
+          Tone.Transport.bpm.value = state.bpm;
+          Tone.Transport.start();
+        }
 
         isToneReady = true;
         document.getElementById('statusIndicator').className = 'w-2 h-2 rounded-full bg-emerald-500';
@@ -691,35 +839,53 @@
 
       const durationSec = Math.max(0.04, state.noteLength);
       const now = Tone.now();
+      const gridSec = getGridIntervalSec();
+
+      let scheduledToneTime = now;
+      if (gridSec > 0) {
+        // Snap to next upcoming quantized beat subdivision with 5ms audio buffer headroom
+        const leadTime = 0.005;
+        scheduledToneTime = Math.ceil((now + leadTime) / gridSec) * gridSec;
+      }
 
       // 1. Play synthesized tone
       if (synth && isToneReady && state.isPlaying) {
         try {
-          synth.triggerAttackRelease(noteObj.name, durationSec, now, velocity);
+          synth.triggerAttackRelease(noteObj.name, durationSec, scheduledToneTime, velocity);
         } catch (e) {}
       }
 
       // 2. Stream to Web MIDI Out
       if (state.webMidiOutput) {
         try {
+          const delayMs = Math.max(0, (scheduledToneTime - now) * 1000);
           const noteNumber = noteObj.midi;
           const velByte = Math.min(127, Math.max(1, Math.floor(velocity * 127)));
-          state.webMidiOutput.send([0x90, noteNumber, velByte]);
           setTimeout(() => {
             if (state.webMidiOutput) {
-              state.webMidiOutput.send([0x80, noteNumber, 0]);
+              state.webMidiOutput.send([0x90, noteNumber, velByte]);
+              setTimeout(() => {
+                if (state.webMidiOutput) {
+                  state.webMidiOutput.send([0x80, noteNumber, 0]);
+                }
+              }, durationSec * 1000);
             }
-          }, durationSec * 1000);
+          }, delayMs);
         } catch (err) {
           console.warn("MIDI output error", err);
         }
       }
 
-      // 3. Record MIDI event
+      // 3. Record MIDI event (quantized to metric grid when enabled)
       if (state.isRecording) {
         const offsetMs = performance.now() - state.recordingStartTime;
+        let eventTimeMs = offsetMs;
+        if (gridSec > 0) {
+          const gridMs = gridSec * 1000;
+          eventTimeMs = Math.round(offsetMs / gridMs) * gridMs;
+        }
         state.recordedEvents.push({
-          timeMs: offsetMs,
+          timeMs: Math.max(0, eventTimeMs),
           midi: noteObj.midi,
           noteName: noteObj.name,
           velocity: Math.floor(velocity * 127),
@@ -791,13 +957,22 @@
       }
 
       const ticksPerQuarter = 480;
-      const bpm = 120;
+      const bpm = state.bpm;
       const msPerTick = (60000 / bpm) / ticksPerQuarter;
+      const gridDiv = getGridDivision(state.quantizeGrid);
+      const gridTicks = gridDiv > 0 ? Math.max(1, Math.round(ticksPerQuarter * gridDiv)) : 1;
 
       const midiEvents = [];
       state.recordedEvents.forEach(ev => {
-        const onTick = Math.max(0, Math.round(ev.timeMs / msPerTick));
-        const offTick = onTick + Math.max(40, Math.round(ev.durationMs / msPerTick));
+        let onTick = Math.max(0, Math.round(ev.timeMs / msPerTick));
+        if (gridTicks > 1) {
+          onTick = Math.round(onTick / gridTicks) * gridTicks;
+        }
+        let durTicks = Math.max(40, Math.round(ev.durationMs / msPerTick));
+        if (gridTicks > 1) {
+          durTicks = Math.max(gridTicks, Math.round(durTicks / gridTicks) * gridTicks);
+        }
+        const offTick = onTick + durTicks;
 
         midiEvents.push({ tick: onTick, type: 0x90, midi: ev.midi, velocity: ev.velocity });
         midiEvents.push({ tick: offTick, type: 0x80, midi: ev.midi, velocity: 0 });
@@ -811,8 +986,14 @@
       const trackName = "AetherMidi";
       for (let i = 0; i < trackName.length; i++) trackBytes.push(trackName.charCodeAt(i));
 
-      // Set Tempo (120 BPM = 500,000 microseconds per quarter note)
-      trackBytes.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
+      // Dynamic Tempo Meta-Event: 60,000,000 / BPM microseconds per quarter note
+      const usPerQuarter = Math.round(60000000 / bpm);
+      trackBytes.push(
+        0x00, 0xFF, 0x51, 0x03,
+        (usPerQuarter >> 16) & 0xFF,
+        (usPerQuarter >> 8) & 0xFF,
+        usPerQuarter & 0xFF
+      );
 
       let lastTick = 0;
       for (const ev of midiEvents) {
@@ -914,8 +1095,9 @@
       }
 
       update(dt) {
-        // Effective velocity scaled by master speed lever
-        const timeScale = state.speedMultiplier;
+        // Effective velocity scaled by master speed lever and optional BPM tempo sync
+        const bpmScale = state.syncOrbitBpm ? (state.bpm / 120) : 1.0;
+        const timeScale = state.speedMultiplier * bpmScale;
 
         // Gravitational attraction toward center
         const dxCenter = centerX - this.x;
@@ -1267,6 +1449,37 @@
 
     /* SPEED, DENSITY & ARTICULATION LEVER LISTENERS */
 
+    // Tempo / BPM Listeners
+    const hdrBpm = document.getElementById('hdrBpm');
+    const rngBpm = document.getElementById('rngBpm');
+    if (hdrBpm) {
+      hdrBpm.addEventListener('change', (e) => setBpm(e.target.value));
+      hdrBpm.addEventListener('input', (e) => setBpm(e.target.value));
+    }
+    if (rngBpm) {
+      rngBpm.addEventListener('input', (e) => setBpm(e.target.value));
+    }
+    document.querySelectorAll('.btn-quick-bpm').forEach(btn => {
+      btn.addEventListener('click', () => setBpm(btn.dataset.bpm));
+    });
+    const chkSyncOrbitBpm = document.getElementById('chkSyncOrbitBpm');
+    if (chkSyncOrbitBpm) {
+      chkSyncOrbitBpm.addEventListener('change', (e) => {
+        state.syncOrbitBpm = e.target.checked;
+        updateCalculatedIncidentEstimate();
+      });
+    }
+
+    // Quantification Grid Listeners
+    const hdrQuantize = document.getElementById('hdrQuantize');
+    const selQuantize = document.getElementById('selQuantize');
+    if (hdrQuantize) {
+      hdrQuantize.addEventListener('change', (e) => setQuantize(e.target.value));
+    }
+    if (selQuantize) {
+      selQuantize.addEventListener('change', (e) => setQuantize(e.target.value));
+    }
+
     // Lever 1: Speed
     document.getElementById('rngSpeed').addEventListener('input', (e) => {
       const spd = parseFloat(e.target.value);
@@ -1371,19 +1584,23 @@
     const PRESETS = {
       sparseZen: {
         root: 'A', scale: 'hirajoshi', minOct: 2, maxOct: 5,
-        speed: 0.12, noteLength: 1.8, spokes: 2, separation: 450, nodes: 3, prob: 60, reverb: 65
+        speed: 0.12, noteLength: 1.8, spokes: 2, separation: 450, nodes: 3, prob: 60, reverb: 65,
+        bpm: 75, quantize: 'off'
       },
       pluckedHarp: {
         root: 'D', scale: 'dorian', minOct: 2, maxOct: 5,
-        speed: 0.40, noteLength: 0.14, spokes: 6, separation: 100, nodes: 4, prob: 90, reverb: 30
+        speed: 0.40, noteLength: 0.14, spokes: 6, separation: 100, nodes: 4, prob: 90, reverb: 30,
+        bpm: 110, quantize: '1/8'
       },
       denseOstinato: {
         root: 'C', scale: 'pentatonicMinor', minOct: 2, maxOct: 4,
-        speed: 2.2, noteLength: 0.08, spokes: 12, separation: 40, nodes: 5, prob: 100, reverb: 20
+        speed: 2.2, noteLength: 0.08, spokes: 12, separation: 40, nodes: 5, prob: 100, reverb: 20,
+        bpm: 136, quantize: '1/16'
       },
       ambientDrone: {
         root: 'F', scale: 'lydian', minOct: 1, maxOct: 5,
-        speed: 0.20, noteLength: 3.2, spokes: 3, separation: 300, nodes: 4, prob: 75, reverb: 80
+        speed: 0.20, noteLength: 3.2, spokes: 3, separation: 300, nodes: 4, prob: 75, reverb: 80,
+        bpm: 65, quantize: 'off'
       }
     };
 
@@ -1430,6 +1647,9 @@
 
       document.getElementById('rngReverb').value = p.reverb;
       document.getElementById('valReverb').textContent = `${p.reverb}%`;
+
+      if (p.bpm) setBpm(p.bpm);
+      if (p.quantize) setQuantize(p.quantize);
 
       if (reverb) reverb.wet.value = state.reverbWet;
       updateSynthEnvelopes();
@@ -1478,6 +1698,8 @@
       recomputeScale();
       updateSpokesGeometry();
       resetOrbitals();
+      setBpm(state.bpm);
+      setQuantize(state.quantizeGrid);
       initWebMidi();
       requestAnimationFrame(renderLoop);
     });
